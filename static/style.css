@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+/* =========================================================
+   THEME TOKENS & BOOTSTRAP OVERRIDES
+   Light theme is the default (data-theme="light" or absent).
+   Dark theme activates via [data-theme="dark"] on <html>.
+   ========================================================= */
+:root,
+html[data-theme="light"] {
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-alt: #EEF0F3;
+    --border: #E1E4E9;
+    --text-primary: #12151A;
+    --text-secondary: #5B6270;
+    --accent: #0F766E;
+    --accent-hover: #0B5C56;
+    --accent-contrast: #FFFFFF;
+    --success: #0F9D58;
+    --warning: #B45309;
+    --danger: #C0362C;
+    --shadow: none;
+
+    /* Force Bootstrap to inherit our custom variables */
+    --bs-body-bg: var(--bg);
+    --bs-body-color: var(--text-primary);
+    --bs-heading-color: var(--text-primary);
+    --bs-card-color: var(--text-primary);
+}
+
+html[data-theme="dark"] {
+    --bg: #0E1013;
+    --surface: #16191E;
+    --surface-alt: #1D2127;
+    --border: #2A2F37;
+    --text-primary: #EDEEF0;
+    --text-secondary: #9198A3;
+    --accent: #2DD4BF;
+    --accent-hover: #5EEAD4;
+    --accent-contrast: #0B1110;
+    --success: #34D399;
+    --warning: #FBBF24;
+    --danger: #F87171;
+    --shadow: none;
+
+    /* Force Bootstrap to inherit our custom variables */
+    --bs-body-bg: var(--bg);
+    --bs-body-color: var(--text-primary);
+    --bs-heading-color: var(--text-primary);
+    --bs-card-color: var(--text-primary);
+}
+
+* {
+    scrollbar-color: var(--border) transparent;
+}
+
+html {
+    color-scheme: light;
+}
+html[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: var(--bg) !important;
+    color: var(--text-primary) !important;
+    min-height: 100vh;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-font {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.text-info, a { color: var(--accent) !important; }
+
+/* Numeric readouts get tabular figures instead of a monospace face,
+   so digits align without pulling in a "terminal" aesthetic. */
+.data-figure {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+/* ================= FLAT CARD ================= */
+.custom-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    color: var(--text-primary) !important; /* Explicitly force visible text */
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.custom-card:hover {
+    border-color: var(--accent) !important;
+}
+
+/* ================= SIDEBAR ================= */
+#wrapper {
+    display: flex;
+    width: 100%;
+}
+
+#sidebar-wrapper {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-heading {
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.sidebar-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+#sidebar-wrapper .list-group-item {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-left: 3px solid transparent;
+    padding: 14px 22px;
+    font-weight: 500;
+    font-size: 0.98rem;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    color: var(--text-primary);
+    background: var(--surface-alt);
+}
+
+#sidebar-wrapper .list-group-item.active {
+    color: var(--accent);
+    background: var(--surface-alt);
+    border-left-color: var(--accent);
+    font-weight: 600;
+}
+
+/* ================= NAVBAR & BADGES ================= */
+.futuristic-nav {
+    background: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.hud-badge {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Light / dark toggle */
+.theme-toggle-btn {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ================= SECTION HEADING ================= */
+.section-heading {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+/* ================= ACCORDION ================= */
+.accordion-item {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.accordion-button {
+    background: var(--surface) !important;
+    color: var(--text-primary) !important;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    color: var(--accent) !important;
+    background: var(--surface-alt) !important;
+    border-bottom: 1px solid var(--border);
+}
+
+.accordion-button::after {
+    filter: none;
+}
+html[data-theme="dark"] .accordion-button::after {
+    filter: invert(1) brightness(1.8);
+}
+
+.accordion-body {
+    background: var(--surface) !important;
+    color: var(--text-secondary);
+    font-size: 0.98rem;
+    line-height: 1.6;
+}
+
+/* ================= BUTTONS & INPUTS ================= */
+.btn-futuristic {
+    background: var(--accent);
+    border: none;
+    color: var(--accent-contrast);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0;
+    box-shadow: none;
+    transition: background-color 0.15s ease;
+}
+
+.btn-futuristic:hover {
+    background: var(--accent-hover);
+    color: var(--accent-contrast);
+}
+
+.btn-outline-flat {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-outline-flat:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.form-control-futuristic {
+    background: var(--surface-alt) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.form-control-futuristic::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.form-control-futuristic:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+
+/* Utility text colors that respect the theme */
+.text-secondary-theme { color: var(--text-secondary) !important; }
+.text-primary-theme { color: var(--text-primary) !important; }
+.border-theme { border-color: var(--border) !important; }
+
+/* Status colors stay semantic across both themes */
+.text-success-flat { color: var(--success) !important; }
+.text-warning-flat { color: var(--warning) !important; }
+.text-danger-flat { color: var(--danger) !important; }
+.bg-success-flat { background: var(--success) !important; color: #fff !important; }
+.bg-warning-flat { background: var(--warning) !important; color: #fff !important; }
+.bg-danger-flat { background: var(--danger) !important; color: #fff !important; }
+.bg-neutral-flat { background: var(--surface-alt) !important; color: var(--text-secondary) !important; }
+
+/* ================= MOBILE RESPONSIVENESS ================= */
+#sidebar-toggle-btn {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #sidebar-toggle-btn {
+        display: inline-flex;
+    }
+
+    #sidebar-wrapper {
+        position: fixed;
+        top: 0;
+        left: -260px;
+        z-index: 1050;
+        transition: left 0.2s ease;
+    }
+
+    #sidebar-wrapper.show {
+        left: 0;
+    }
+
+    #sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1040;
+    }
+
+    #sidebar-backdrop.show {
+        display: block;
+    }
+}

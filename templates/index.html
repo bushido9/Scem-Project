@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCEM - Smart Classroom Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script>
+        // Apply the saved/preferred theme before first paint to avoid a flash.
+        (function () {
+            var saved = localStorage.getItem('scem-theme');
+            var theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+<body>
+
+    <div class="d-flex" id="wrapper">
+        <!-- SIDEBAR -->
+        <div id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4">
+                <span class="sidebar-mark mb-2">
+                    <i class="bi bi-cpu"></i>
+                </span>
+                <h5 class="fw-bold mb-0 brand-font">SCEM CORE</h5>
+                <small class="text-secondary-theme">Smart Environment Monitor</small>
+            </div>
+
+            <div class="list-group list-group-flush my-3">
+                <a href="#" class="list-group-item nav-link-item active" onclick="switchPage(event, 'home')">
+                    <i class="bi bi-house-door me-2"></i> Home
+                </a>
+                <a href="#" class="list-group-item nav-link-item" onclick="switchPage(event, 'dashboard')">
+                    <i class="bi bi-speedometer2 me-2"></i> Main Dashboard
+                </a>
+                <a href="#" class="list-group-item nav-link-item" onclick="switchPage(event, 'about')">
+                    <i class="bi bi-info-circle me-2"></i> About Us
+                </a>
+                <a href="#" class="list-group-item nav-link-item" onclick="switchPage(event, 'faq')">
+                    <i class="bi bi-question-circle me-2"></i> FAQ & Bantuan
+                </a>
+            </div>
+        </div>
+
+        <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+        <!-- MAIN PAGE CONTENT -->
+        <div id="page-content-wrapper" class="w-100">
+            <!-- NAVBAR -->
+            <nav class="navbar navbar-expand-lg futuristic-nav px-4 py-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <button id="sidebar-toggle-btn" class="btn btn-outline-flat btn-sm" onclick="toggleSidebar()">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <h5 class="fw-bold mb-0 brand-font" id="current-page-title">Home</h5>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge hud-badge py-2 px-3 data-figure" id="digital-clock">
+                        00:00:00 WIB
+                    </span>
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle light / dark mode" aria-label="Toggle light or dark mode">
+                        <i id="theme-toggle-icon" class="bi bi-moon-stars"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="container-fluid px-4 py-4">
+
+                <!-- 1. PAGE HOME -->
+                <div id="page-home" class="page-section">
+                    <div class="card custom-card p-5 text-center">
+                        <h2 class="fw-bold mb-3 brand-font">Welcome to SCEM Dashboard</h2>
+                        <p class="lead text-secondary-theme mx-auto" style="max-width: 750px;">
+                            Smart Classroom Environment Monitor utilizing IoT sensors and cloud MQTT streaming to provide real-time thermal microclimate analytics.
+                        </p>
+                        <div class="mt-4">
+                            <button class="btn btn-futuristic btn-lg rounded-pill px-5" onclick="switchPage(event, 'dashboard')">
+                                Launch Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PAGE MAIN DASHBOARD -->
+                <div id="page-dashboard" class="page-section d-none">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card h-100 custom-card p-3 text-center">
+                                <p class="text-secondary-theme small mb-1 brand-font">Suhu Saat Ini</p>
+                                <h2 class="display-6 fw-bold brand-font data-figure" id="val-suhu" style="color: var(--accent);">-- °C</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card h-100 custom-card p-3 text-center">
+                                <p class="text-secondary-theme small mb-1 brand-font">Kelembapan</p>
+                                <h2 class="display-6 fw-bold brand-font data-figure" id="val-kelembapan" style="color: #6366F1;">-- %</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card h-100 custom-card p-3 text-center">
+                                <p class="text-secondary-theme small mb-1 brand-font">Status Kenyamanan</p>
+                                <h5 class="fw-bold mt-2 brand-font" id="val-status">Menunggu...</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card h-100 custom-card p-3">
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="bi bi-whatsapp me-2" style="color: var(--success);"></i>
+                                    <p class="text-secondary-theme small mb-0 fw-bold brand-font">Status Pesan WA</p>
+                                </div>
+                                <span class="badge bg-neutral-flat mb-1" id="wa-badge">Belum Terkirim</span>
+                                <small class="text-secondary-theme" style="font-size: 0.75rem;" id="wa-time">Terakhir: -</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REAL-TIME GRAPH -->
+                    <div class="card custom-card mb-4">
+                        <div class="card-header bg-transparent border-0 border-bottom pt-3 border-theme d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <h5 class="fw-bold mb-0 section-heading">
+                                <i class="bi bi-activity me-2" style="color: var(--accent);"></i>Real-Time Temperature & Humidity Trend
+                            </h5>
+                            <button id="reset-zoom-btn" class="btn btn-outline-flat btn-sm">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Zoom
+                            </button>
+                        </div>
+                        <div class="card-body p-3">
+                            <p class="text-secondary-theme small mb-2">Scroll to zoom, drag to pan, hover a point for exact readings.</p>
+                            <div style="height: 360px; width: 100%;">
+                                <canvas id="tempChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. PAGE ABOUT US -->
+                <div id="page-about" class="page-section d-none">
+                    <div class="card custom-card p-4">
+                        <h4 class="fw-bold mb-3 brand-font">Tentang Proyek SCEM</h4>
+                        <p class="text-secondary-theme">SCEM (Smart Classroom Environment Monitor) dikembangkan untuk memantau suhu dan kelembapan ruang kelas menggunakan mikroprosesor ESP32, sensor DHT22, protokol MQTT Cloud, serta dasbor interaktif Python Flask.</p>
+                        <h6 class="fw-bold mt-3 brand-font">Fitur Unggulan:</h6>
+                        <ul class="text-secondary-theme">
+                            <li>Pemantauan grafik real-time dan interaktif (zoom &amp; pan).</li>
+                            <li>Peringatan otomatis via WhatsApp jika suhu melampaui 29.0°C.</li>
+                            <li>Alarm buzzer lokal di perangkat ESP32.</li>
+                            <li>Mode tampilan terang dan gelap yang dapat dipilih pengguna.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 4. PAGE FAQ -->
+                <div id="page-faq" class="page-section d-none">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card custom-card p-4">
+                                <h5 class="fw-bold mb-3 brand-font">Pertanyaan Umum (FAQ)</h5>
+                                <div class="accordion" id="faqAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
+                                                Bagaimana jika suhu kelas di atas 29°C?
+                                            </button>
+                                        </h2>
+                                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                            <div class="accordion-body">
+                                                Sistem secara otomatis membunyikan buzzer peringatan pada ESP32 dan mengirimkan pesan WhatsApp darurat ke nomor admin.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+                                                Berapa sering data diperbarui?
+                                            </button>
+                                        </h2>
+                                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                            <div class="accordion-body">
+                                                Sensor memperbarui telemetry data via MQTT broker setiap 10 detik, dan grafik dasbor menyegarkan tampilan setiap 3 detik.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+                                                Bagaimana jika koneksi internet terputus?
+                                            </button>
+                                        </h2>
+                                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                            <div class="accordion-body">
+                                                ESP32 memiliki buffer retry otomatis yang akan terus berusaha menyambungkan ulang ke MQTT Broker. Data lokal disimpan sementara hingga koneksi pulih.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EMAIL FORM -->
+                        <div class="col-md-6">
+                            <div class="card custom-card p-4">
+                                <h5 class="fw-bold mb-3 brand-font"><i class="bi bi-envelope me-2"></i>Kirim Pertanyaan ke Gmail</h5>
+                                <form id="faq-form" onsubmit="handleFaqSubmit(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-secondary-theme">Nama Anda</label>
+                                        <input type="text" id="faq-nama" class="form-control form-control-futuristic" placeholder="Nama lengkap" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-secondary-theme">Email Anda</label>
+                                        <input type="email" id="faq-email" class="form-control form-control-futuristic" placeholder="nama@email.com" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-secondary-theme">Pertanyaan / Pesan</label>
+                                        <textarea id="faq-pesan" class="form-control form-control-futuristic" rows="3" placeholder="Tuliskan pertanyaan kamu..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-futuristic w-100 py-2" id="btn-submit-faq">
+                                        Kirim ke Gmail Admin
+                                    </button>
+                                </form>
+                                <div id="faq-alert" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
