@@ -2,8 +2,8 @@
 #include <PubSubClient.h>
 #include <DHT.h>
 
-const char* ssid = "KIAMARU-5G";
-const char* password = "qwerty81";
+const char* ssid = "-";
+const char* password = "-";
 
 // Public MQTT Broker (Bebas IP Lokal)
 const char* mqtt_server = "broker.hivemq.com";
